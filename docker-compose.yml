@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:17.4-alpine
+    container_name: pack-app-postgres
+    environment:
+      POSTGRES_USER: pack_admin
+      POSTGRES_PASSWORD: pack_password
+      POSTGRES_DB: pack_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pack_admin -d pack_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./Pack_BE
+      dockerfile: deploy/Dockerfile
+    container_name: pack-app-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pack_db
+      SPRING_DATASOURCE_USERNAME: pack_admin
+      SPRING_DATASOURCE_PASSWORD: pack_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      MYAPP_FILE_UPLOAD_MAX_SIZE_IN_BYTES: ${MYAPP_FILE_UPLOAD_MAX_SIZE_IN_BYTES:-10485760}
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Pack_FE
+      dockerfile: deploy/Dockerfile
+    container_name: pack-app-frontend-nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

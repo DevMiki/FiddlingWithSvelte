@@ -1,0 +1,90 @@
+{
+  "success": "success",
+  "field": "field",
+  "table": {
+    "sort": {
+      "title": "Sort by Title {order}",
+      "category": "Sort by Category {order}",
+      "language": "Sort by Language {order}",
+      "provider": "Sort by Provider {order}",
+      "roles": "Sort by Roles {order}",
+      "attachments": "Sort by Attachment Count {order}"
+    },
+    "title": "Resources",
+    "upload": "Upload New Resource",
+    "viewAttachments": "View Attachments",
+    "cols": {
+      "title": "Title",
+      "category": "Category",
+      "language": "Language",
+      "provider": "Provider",
+      "roles": "Roles",
+      "attachments": "Attachments"
+    },
+    "noResources": "No resources found"
+  },
+  "attachmentsModal": {
+    "title": "Uploaded attachments",
+    "uploadedOn": "Uploaded on",
+    "view": "View",
+    "download": "Download",
+    "viewActionTitle": "View attachment",
+    "downloadActionTitle": "Download attachment"
+  },
+  "roles": {
+    "mentor_coach": "Mentor/Coach",
+    "mentee_coachee": "Mentee/Coachee"
+  },
+  "category": {
+    "leadership": "Leadership",
+    "managing_complexity": "Managing Complexity"
+  },
+  "language": {
+    "en": "English",
+    "it": "Italian",
+    "es": "Spanish"
+  },
+  "provider": {
+    "skilla": "Skilla",
+    "linkedin": "LinkedIn",
+    "pack": "Pack",
+    "mentor": "Mentor"
+  },
+  "upload": {
+    "dragDropMoreOr": "Drag and drop more files here",
+    "dragDropOr": "Or drag here your files",
+    "dropFilesHere": "Drop here your files",
+    "formTitle": "Upload Form",
+    "labels": {
+      "title": "Title",
+      "description": "Description",
+      "language": "Language",
+      "category": "Category",
+      "provider": "Provider",
+      "role": "Role"
+    },
+    "placeholders": {
+      "title": "Title",
+      "description": "Description",
+      "selectLanguage": "Select language",
+      "selectCategory": "Select category",
+      "selectProvider": "Select provider",
+      "selectRole": "Select role"
+    },
+    "noFilesSelected": "No file selected",
+    "selectFiles": "Select files",
+    "selectMoreFiles": "Select more files",
+    "submit": "Upload",
+    "error": "Please fill in all mandatory fields—including a file",
+    "success": "File uploaded successfully"
+  },
+  "validation.required": "{field} is required.",
+  "validation.minFiles": "Please select at least {count} file.",
+  "common.notSet": "-",
+  "languageSwitcher": {
+    "selectLabel": "Select language",
+    "english": "English",
+    "italian": "Italian",
+    "spanish": "Spanish"
+  }
+}

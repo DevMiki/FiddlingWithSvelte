@@ -1,0 +1,93 @@
+{
+  "success": "éxito",
+  "field": "campo",
+  "table": {
+    "sort": {
+      "title": "Ordenar por Título {order}",
+      "category": "Ordenar por Categoría {order}",
+      "language": "Ordenar por Idioma {order}",
+      "provider": "Ordenar por Proveedor {order}",
+      "roles": "Ordenar por Roles {order}",
+      "attachments": "Ordenar por N. Adjuntos {order}"
+    },
+    "title": "Recursos",
+    "upload": "Subir Nuevo Recurso",
+    "cols": {
+      "title": "Título",
+      "category": "Categoría",
+      "language": "Idioma",
+      "provider": "Proveedor",
+      "roles": "Roles",
+      "attachments": "Adjuntos"
+    },
+    "noResources": "No se encontraron recursos",
+    "sort.indicator.none": "(ordenable)",
+    "sort.indicator.ascending": "(ascendente)",
+    "sort.indicator.descending": "(descendente)",
+    "viewAttachments": "Ver Adjuntos"
+  },
+  "attachmentsModal": {
+    "title": "Adjuntos subidos",
+    "uploadedOn": "Subido el",
+    "view": "Ver",
+    "download": "Descargar",
+    "viewActionTitle": "Ver adjunto",
+    "downloadActionTitle": "Descargar adjunto"
+  },
+  "roles": {
+    "mentor_coach": "Mentor/Coach",
+    "mentee_coachee": "Mentee/Coachee"
+  },
+  "category": {
+    "leadership": "Liderazgo",
+    "managing_complexity": "Gestión de la Complejidad"
+  },
+  "language": {
+    "en": "Inglés",
+    "it": "Italiano",
+    "es": "Español"
+  },
+  "provider": {
+    "skilla": "Skilla",
+    "linkedin": "LinkedIn",
+    "pack": "Pack",
+    "mentor": "Mentor"
+  },
+  "upload": {
+    "dragDropMoreOr": "Arrastra y suelta aquí más archivos",
+    "dragDropOr": "O arrastra aquí tus archivos",
+    "dropFilesHere": "Suelta aquí tus archivos",
+    "formTitle": "Formulario de Subida",
+    "labels": {
+      "title": "Título",
+      "description": "Descripción",
+      "language": "Idioma",
+      "category": "Categoría",
+      "provider": "Proveedor",
+      "role": "Rol"
+    },
+    "placeholders": {
+      "title": "Título",
+      "description": "Descripción",
+      "selectLanguage": "Seleccionar idioma",
+      "selectCategory": "Seleccionar categoría",
+      "selectProvider": "Seleccionar proveedor",
+      "selectRole": "Seleccionar rol"
+    },
+    "noFilesSelected": "Ningún archivo seleccionado",
+    "selectFiles": "Seleccionar archivos",
+    "selectMoreFiles": "Seleccionar más archivos",
+    "submit": "Subir",
+    "error": "Por favor, rellene todos los campos obligatorios, incluido un archivo",
+    "success": "Archivo subido con éxito"
+  },
+  "validation.required": "{field} es obligatorio.",
+  "validation.minFiles": "Seleccione al menos {count} archivo(s).",
+  "common.notSet": "-",
+  "languageSwitcher": {
+    "selectLabel": "Seleccionar idioma",
+    "english": "Inglés",
+    "italian": "Italiano",
+    "spanish": "Español"
+  }
+}
