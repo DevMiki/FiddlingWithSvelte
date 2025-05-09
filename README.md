@@ -1,4 +1,4 @@
-# Pack_Table_Upload Application
+# Pack Table Upload Application
 
 This project is a simple web application featuring a sortable table with file upload functionality, a form for resource submission, a drag-and-drop functionality and an i18n module with a Spring Boot backend, and a SvelteKit frontend served via Nginx. The entire application is containerized using Docker and orchestrated with Docker Compose.
 
