@@ -4,12 +4,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tech.thepack.core.resource.model.Attachment;
-import tech.thepack.core.resource.model.Resource;
 import tech.thepack.web.resource.dto.AttachmentMetadataDTO;
+import tech.thepack.web.resource.dto.ResourceDTO;
 import tech.thepack.web.resource.dto.ResourceFormDataDTO;
 import tech.thepack.web.resource.mappers.ResourceMapper;
 import tech.thepack.web.resource.service.ResourceService;
-import tech.thepack.web.resource.dto.ResourceDTO;
 
 import java.util.List;
 

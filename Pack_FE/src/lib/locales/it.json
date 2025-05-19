@@ -54,6 +54,7 @@
     "mentor": "Mentor"
   },
   "upload": {
+    "validationError": "Errore di validazione, controlla i campi!",
     "dragDropMoreOr": "Trascina e rilascia qui altri file",
     "dragDropOr": "O trascina qui i tuoi file",
     "dropFilesHere": "Rilascia qui i tuoi file",
@@ -64,7 +65,10 @@
       "language": "Lingua",
       "category": "Categoria",
       "provider": "Fornitore",
-      "role": "Ruolo"
+      "roles": "Ruoli"
+    },
+    "validation": {
+      "minSelection": "Il campo {{field}} richiede almeno {count} elemento."
     },
     "placeholders": {
       "title": "Titolo",

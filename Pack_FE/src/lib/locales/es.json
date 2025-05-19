@@ -54,6 +54,7 @@
     "mentor": "Mentor"
   },
   "upload": {
+    "validationError": "Error de validación",
     "dragDropMoreOr": "Arrastra y suelta aquí más archivos",
     "dragDropOr": "O arrastra aquí tus archivos",
     "dropFilesHere": "Suelta aquí tus archivos",
@@ -64,7 +65,10 @@
       "language": "Idioma",
       "category": "Categoría",
       "provider": "Proveedor",
-      "role": "Rol"
+      "roles": "Roles"
+    },
+    "validation": {
+      "minSelection": "Seleccione al menos {count} {field}."
     },
     "placeholders": {
       "title": "Título",

@@ -12,10 +12,10 @@
     let attachments: AttachmentMetadata[] = [];
     let isLoadingAttachments = true;
     let loadingErrorMessage: string | null = null;
-    let modalOverlayElement: HTMLDivElement;
+    let attachmentsModal: HTMLDivElement;
 
     onMount(async () => {
-        modalOverlayElement?.focus();
+        attachmentsModal?.focus();
         try {
             attachments = await getResourceAttachments(resourceId);
         } catch (error: any) {
@@ -25,6 +25,7 @@
         } finally {
             isLoadingAttachments = false;
         }
+        // This is called for every key press
         window.addEventListener('keydown', handleGlobalKeyDown);
     });
 
@@ -38,17 +39,21 @@
         }
     }
 
-    // Just to close the dialog by clicking outside
+    // Just to close the dialog by clicking outside (on the overlay)
+    // event.target: This property always refers to the innermost element that was the actual target of the event.
+    // If the user clicks directly on a button inside modal-content-container, then event.target would be that button
+    // event.currentTarget: This property always refers to the element
+    // to which the event listener is currently attached and for which the event is being processed.
     function handleOverlayClick(event: MouseEvent) {
         if (event.target === event.currentTarget) {
             closeDialog();
         }
     }
 
-    // To remove this error that was bothering me: "Svelte: Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler."
+    // To remove this error that was bothering me: "Svelte: Visible, non-interactive elements with a click event
+    // must be accompanied by a keyboard event handler."
     function handleOverlayKeyDown(event: KeyboardEvent) {
         if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
-            event.preventDefault();
             closeDialog();
         }
     }
@@ -89,7 +94,6 @@
     function getIconClassForFileType(fileType: string | null | undefined): string {
         // Default if fileType is missing
         if (!fileType) return 'bi-file-earmark';
-        console.log(fileType)
         if (fileType === 'application/pdf') return 'bi-file-earmark-pdf';
         if (fileType.startsWith('audio/mpeg')) return 'bi-file-earmark-music';
         if (fileType.startsWith('video/')) return 'bi-file-earmark-play';
@@ -121,7 +125,7 @@
         aria-modal="true"
         aria-labelledby="attachments-dialog-title"
         tabindex="-1"
-        bind:this={modalOverlayElement}
+        bind:this={attachmentsModal}
 >
     <div class="modal-content-container">
         <button type="button" class="close-dialog-button" on:click={closeDialog} aria-label={$t('common.close')}>×</button>

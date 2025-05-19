@@ -1,19 +1,17 @@
 <script lang="ts">
-    import {t, locale} from 'svelte-i18n';
+    import {t, locale as i18nLocaleStore} from 'svelte-i18n';
     import type {Resource} from '$lib/types/resource';
     import AttachmentsModal from './AttachmentsModal.svelte';
 
-    export let onOpenForm: () => void = () => {
-    };
+    // t and locale are writable svelte store
+    // Variables with export are properties
+    export let onOpenForm: () => void = () => {};
     export let resources: Resource[] = [];
 
     let showAttachmentsModal = false;
     let selectedResourceIdForModal: number | null = null;
 
-    type SortableKey =
-        keyof Pick<Resource, 'title' | 'category' | 'language' | 'provider'>
-        | 'roles'
-        | 'attachmentCount';
+    type SortableKey = keyof Pick<Resource, 'title' | 'category' | 'language' | 'provider' | 'roles' | 'attachmentCount'>;
     type SortDirection = 'asc' | 'desc';
 
     let sortKey: SortableKey | null = null;
@@ -24,6 +22,8 @@
         selectedResourceIdForModal = null;
     }
 
+    // Helper function to get the translated enum value because sorting the resource directly like
+    // resource.category would result in a mismatch since you'd be sorting by KEY and not VALUE.
     function getSortableValue(resource: Resource, key: SortableKey): string | number {
         switch (key) {
             case 'category':
@@ -52,29 +52,21 @@
         }
     }
 
-    $: sortedResources = [...resources].sort((firstResource, secondResource) => {
-        if (!sortKey) return 0; // If you don't click, then don't sort
-
-        const firstCompareValue = getSortableValue(firstResource, sortKey);
-        const secondCompareValue = getSortableValue(secondResource, sortKey);
-
-        const sortOrderFactor = sortDirection === 'asc' ? 1 : -1;
-
-        if (firstCompareValue < secondCompareValue) {
-            return -1 * sortOrderFactor;
+    function getTranslatedEnum(prefix: string, value: string | null | undefined, fallback = '-') {
+        if (value) {
+            const key = value.toLowerCase();
+            return $t(`${prefix}.${key}`, {default: fallback});
         }
-        if (firstCompareValue > secondCompareValue) {
-            return 1 * sortOrderFactor;
-        }
-        return 0;
-    });
+        return $t('common.notSet', {default: fallback});
+    }
 
+    // Called when a table header is clicked
     function handleSort(key: SortableKey) {
         if (sortKey === key) {
             sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
             sortKey = key;
-            sortDirection = 'asc';
+            sortDirection = 'desc';
         }
     }
 
@@ -83,6 +75,37 @@
         return sortDirection === 'asc' ? '▲' : '▼';
     }
 
+
+    // This is Svelte syntax for reactive declarations. sortedResources is a derived variable, its value depends on resources,
+    // sortKey and sortDirection. Whenever any of these dependencies change, Svelte will automatically re-run the code to the right of the '='
+    // and update sortedResources.
+    // The big benefit of this $: reactive declaration is that i don't have to invoke a function every time the user clicks on a column header
+    // or when the data change. This is synced automatically.
+    // sortKey and sortDirection are changed when a table header is clicked
+    // resources when you load or upload data
+    // it means: 'Svelte', please watch these variables, and if they change, redo this calculation and update sortedResources
+    // remember that the function the sort takes, is just the logic that the internal algorithm will use.
+    $: sortedResources = [...resources].sort((firstResource, secondResource) => {
+        if (!sortKey) return 0; // If you don't click, then don't sort
+
+        const firstCompareValue = getSortableValue(firstResource, sortKey);
+        const secondCompareValue = getSortableValue(secondResource, sortKey);
+
+        // This is useful to flip the result of a comparison if a descending order is needed
+        const sortOrderFactor = sortDirection === 'asc' ? 1 : -1;
+
+        // Js compares these lexicographically like a dictionary so:
+        // cat < category, 10 < 2, a < b...
+        // If we want to see apple to come first of banana, then we want to return -1 and since the order is ascending
+        // we want to keep it like this, so * sortDirection where sortDirection === 'asc' ? 1
+        if (firstCompareValue < secondCompareValue) {
+            return -1 * sortOrderFactor;
+        }
+        if (firstCompareValue > secondCompareValue) {
+            return 1 * sortOrderFactor;
+        }
+        return 0;
+    });
 
     function viewAttachments(resourceId: number) {
         selectedResourceIdForModal = resourceId;
@@ -94,41 +117,38 @@
         selectedResourceIdForModal = null;
     }
 
-    function getTranslatedEnum(prefix: string, value: string | null | undefined, fallback = '-') {
-        if (value && value.trim() && value.toLowerCase() !== 'null') {
-            const key = value.toLowerCase();
-            return $t(`${prefix}.${key}`, {default: fallback});
-        }
-        return $t('common.notSet', {default: fallback});
-    }
-
     const supportedLocales = [
         {code: 'en', nameKey: 'languageSwitcher.english'},
         {code: 'it', nameKey: 'languageSwitcher.italian'},
         {code: 'es', nameKey: 'languageSwitcher.spanish'},
     ];
-
-    function handleLocaleChange(event: Event) {
-        const newLocale = (event.target as HTMLSelectElement).value;
-        if (newLocale) {
-            locale.set(newLocale); // Update the svelte-i18n locale store
-        }
-    }
 </script>
 
 <div class="table-container">
     <div class="table-header">
         <h2>{$t('table.title')}</h2>
         <div class="header-actions">
-            <div class="language-switcher-container">
+            <div>
+                <!-- The value of the 'for' should be the same of the 'id' associated to.
+                with this trick, you can add accessibility for screen readers so if someone uses it he doesn't hear
+                just "combo-box" but something more valuable like what this is about -->
                 <label for="language-select" class="sr-only">{$t('languageSwitcher.selectLabel')}</label>
-                <select id="language-select" bind:value={$locale} on:change={handleLocaleChange}
+                <!-- i18nLocaleStore is a Svelte writable store: it holds a value and allows reactive subscriptions to that value.
+                 When you prefix a name with $, then Svelte automatically handles subscribing and unsubscribing to that store.
+                 this $i18nLocaleStore gives me the current value and bind:value={$i18nLocaleStore} it's double binding.
+                 When the app starts, the value of the store is set to the select. When the user clicks on the select instead,
+                 the value of the option is set to the store, this triggers the svelte-i18n and the text is re-rendered. -->
+                <select id="language-select"
+                        bind:value={$i18nLocaleStore}
                         class="language-select">
                     {#each supportedLocales as loc (loc.code)}
                         <option value={loc.code}>{$t(loc.nameKey)}</option>
                     {/each}
                 </select>
             </div>
+            <!-- on: is the Svelte directive that tells Svelte you want to listen for a DOM event.
+             click is the name of the DOM event you want to listen to!
+             {onOpenForm} is the handler function you want to execute when the event occurs. It can be an inline function too -->
             <button type="button" class="upload-btn" on:click={onOpenForm}>
                 {$t('table.upload')}
             </button>
@@ -141,6 +161,8 @@
         <table>
             <thead>
             <tr>
+                <!-- Questi title sono ciò che vedi quando metti il mouse sopra ogni header, tipo tooltip
+                il metodo getSortIndicator quindi mi fa solo visualizzare il corretto simbolo di ordinamento on hover -->
                 <th on:click={() => handleSort('title')} class:sortable={true}
                     title={$t('table.sort.title', {values: { order: getSortIndicator('title')}})}>
                     {$t('table.cols.title')} <span class="sort-indicator">{getSortIndicator('title')}</span>
@@ -163,37 +185,50 @@
                 </th>
                 <th class="attachments-col-header" on:click={() => handleSort('attachmentCount')} class:sortable={true}
                     title={$t('table.sort.attachments', { values: { order: getSortIndicator('attachmentCount')}})}>
-                    {$t('table.cols.attachments')} <span
-                        class="sort-indicator">{getSortIndicator('attachmentCount')}</span>
+                    {$t('table.cols.attachments')} <span class="sort-indicator">{getSortIndicator('attachmentCount')}</span>
                 </th>
             </tr>
             </thead>
+
             <tbody>
 
-            {#each sortedResources as r (r.id)}
+            {#each sortedResources as sortedResource (sortedResource.id)}
+            <!-- By default, HTML table rows (<tr>) are not focusable elements.
+            You can't typically "Tab" to a table row and have it highlight or be interactive via the keyboard.-->
+            <!-- Adding tabindex="0" to the <tr> makes each row in your table focusable.
+            This is often done to improve keyboard accessibility for interactive tables.
+            Useful for SR too and custom keyboard interactions -->
                 <tr tabindex="0">
-                    <td>{r.title}</td>
-                    <td>{getTranslatedEnum('category', r.category)}</td>
-                    <td>{getTranslatedEnum('language', r.language)}</td>
-                    <td>{getTranslatedEnum('provider', r.provider)}</td>
+                    <td>{sortedResource.title}</td>
+                    <td>{getTranslatedEnum('category', sortedResource.category)}</td>
+                    <td>{getTranslatedEnum('language', sortedResource.language)}</td>
+                    <td>{getTranslatedEnum('provider', sortedResource.provider)}</td>
                     <td>
-                        {r.roles && r.roles.length > 0
-                            ? r.roles.map(code => getTranslatedEnum('roles', code)).join(', ')
+                        {sortedResource.roles && sortedResource.roles.length > 0
+                            ? sortedResource.roles.map(role => getTranslatedEnum('roles', role)).join(', ')
                             : $t('common.notSet', {default: '-'})}
                     </td>
                     <td class="attachments-cell">
-                        {#if r.attachmentCount > 0}
+                        {#if sortedResource.attachmentCount > 0}
+                            <!--  stopPropagation  is like putting a lid on the event so it doesn't spill over to the elements outside the button.
+                            It stops the event right at the button and prevents parent elements from reacting to that specific click,
+                             which helps avoid unintended side effects if those parent elements also have click handlers -->
                             <button
                                     type="button"
                                     class="view-attachments-btn"
                                     title={$t('table.viewAttachments')}
-                                    on:click|stopPropagation={() => viewAttachments(r.id)}
+                                    on:click|stopPropagation={() => viewAttachments(sortedResource.id)}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
-                                     fill="currentColor" class="icon">
+                                <!-- Using an embedded SVG is good for performance since the browser shouldn't do more requests
+                                 moreover you can style it inline
+                                 xmlns: namespace declaration for browsers to interpret the markup as SVG
+                                 The d attribute (which stands for "data") contains a series of commands and coordinates that define the shape of the path
+                                 Using a .png would work but not scalable and no cool props like fill -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                      class="margin-right">
                                     <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
                                 </svg>
-                                <span class="count">({r.attachmentCount})</span>
+                                <span class="count">({sortedResource.attachmentCount})</span>
                             </button>
                         {:else}
                             <span class="no-attachments">-</span>
@@ -219,10 +254,12 @@
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Without this the header would overflow the container */
         overflow-x: auto;
     }
 
     /* --- Table Header --- */
+    /* The style of the part above the table header, like the buttons and the title */
     .table-header {
         display: flex;
         align-items: center;
@@ -337,7 +374,7 @@
         border-color: var(--orange);
     }
 
-    .view-attachments-btn .icon {
+    .view-attachments-btn .margin-right {
         width: 1em;
         height: 1em;
         fill: currentColor;
@@ -348,27 +385,21 @@
         font-weight: normal;
     }
 
-    .language-switcher-container {
-        position: relative;
-    }
-
+    /* The chevron down icon */
     .language-select {
-        padding: 0.4rem 0.6rem;
-        padding-right: 2rem;
+        padding: 0.4rem 2rem 0.4rem 0.6rem;
         border: 1px solid var(--orange-dark);
         border-radius: 4px;
         background-color: white;
         color: var(--orange-dark);
         font-weight: 500;
+        font-size: inherit;
         cursor: pointer;
         appearance: none;
         min-width: 130px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e65100' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 0.5rem center;
-        vertical-align: middle;
-        line-height: normal;
-        font-size: inherit;
     }
 
     .language-select:hover {
@@ -416,13 +447,7 @@
     /* --- Utilities --- */
     .sr-only {
         position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
         clip: rect(0, 0, 0, 0);
         white-space: nowrap;
-        border-width: 0;
     }
 </style>

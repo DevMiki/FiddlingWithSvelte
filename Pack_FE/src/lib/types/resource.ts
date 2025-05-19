@@ -1,7 +1,7 @@
 export type Category = 'Leadership' | 'Managing_Complexity';
 export type Language = 'en' | 'it' | 'es';
 export type Provider = 'Skilla' | 'Linkedin' | 'Pack' | 'Mentor';
-export type Role = 'Mentor/Coach' | 'Mentee/Coachee';
+export type Role = 'MENTOR_COACH' | 'MENTEE_COACHEE';
 
 export interface Resource {
     id: number;
